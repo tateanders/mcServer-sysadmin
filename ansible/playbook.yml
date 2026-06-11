@@ -1,0 +1,54 @@
+---
+- name: Configure Minecraft Server
+  hosts: minecraft
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade packages
+      apt:
+        upgrade: dist
+
+    - name: Install Java
+      apt:
+        name: openjdk-21-jre-headless
+        state: present
+
+    - name: Create minecraft directory
+      file:
+        path: /home/ubuntu/minecraft
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Download Minecraft server jar
+      get_url:
+        url: https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/server.jar
+        dest: /home/ubuntu/minecraft/minecraft_server.jar
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Accept EULA
+      copy:
+        content: "eula=true\n"
+        dest: /home/ubuntu/minecraft/eula.txt
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Deploy systemd service file
+      template:
+        src: templates/minecraft.service.j2
+        dest: /etc/systemd/system/minecraft.service
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable and start Minecraft service
+      systemd:
+        name: minecraft
+        enabled: yes
+        state: started
