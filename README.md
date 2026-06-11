@@ -111,11 +111,7 @@ nmap -sV -Pn -p T:25565 <server_ip>
 
 ### Server Shutdown
 
-The `systemd` service includes an `ExecStop` directive that sends `SIGINT` to the Minecraft server process, triggering a graceful shutdown that saves the world state before stopping. This was a known issue with the previous manual setup which lacked a proper stop signal.
-
-### No `user_data`
-
-Server configuration is handled entirely by Ansible rather than the EC2 `user_data` field, which is considered bad practice as it makes configuration harder to debug, version, and rerun.
+The `systemd` service includes an `ExecStop` directive that sends `SIGINT` to the Minecraft server process, triggering a graceful shutdown that saves the world state before stopping.
 
 ### Credential Management
 
